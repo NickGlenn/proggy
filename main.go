@@ -73,11 +73,16 @@ func main() {
 	}
 
 	path := "PROGRESS.md"
-	if flag.NArg() > 0 {
-		path = flag.Arg(0)
+	watchMode := *watch
+	for _, arg := range flag.Args() {
+		if arg == "--watch" || arg == "-watch" {
+			watchMode = true
+		} else {
+			path = arg
+		}
 	}
 
-	if *watch {
+	if watchMode {
 		runWatch(path)
 	} else {
 		if err := render(path); err != nil {
