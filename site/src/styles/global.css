@@ -1,0 +1,70 @@
+:root {
+  --font-mono: "Berkeley Mono", "SF Mono", "JetBrains Mono", "Fira Code", monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+
+  --c-bg: #0e0e10;
+  --c-surface: #18181b;
+  --c-border: #27272a;
+  --c-text: #e4e4e7;
+  --c-text-muted: #71717a;
+  --c-accent: #a1a1aa;
+  --c-green: #4ade80;
+  --c-green-dim: #16a34a;
+  --c-bar-empty: #27272a;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--c-bg);
+  color: var(--c-text);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--c-green);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}

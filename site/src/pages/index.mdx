@@ -1,0 +1,97 @@
+---
+layout: ../layouts/Docs.astro
+title: proggy — markdown checklist progress reports
+---
+
+<div class="features">
+  <div class="feature">
+    <h3>Zero config</h3>
+    <p>Point it at any markdown file with checkboxes. No setup, no config files, no dependencies.</p>
+  </div>
+  <div class="feature">
+    <h3>Live watch</h3>
+    <p>Use <code>--watch</code> to keep the table open. It updates automatically when the file changes.</p>
+  </div>
+  <div class="feature">
+    <h3>Respects your terminal</h3>
+    <p>Honors <code>NO_COLOR</code> and <code>TERM=dumb</code>. Dims completed sections so you can focus on what's left.</p>
+  </div>
+  <div class="feature">
+    <h3>Single binary</h3>
+    <p>Written in Go. No runtime, no dependencies. Install via Homebrew, Scoop, or <code>go install</code>.</p>
+  </div>
+</div>
+
+## Usage
+
+```sh
+# reads PROGRESS.md in the current directory
+proggy
+
+# specify a file
+proggy path/to/TODO.md
+
+# live-watch mode
+proggy --watch
+
+# print version
+proggy --version
+```
+
+## Markdown format
+
+proggy expects `##` headings for sections and `- [x]` / `- [ ]` checkboxes for items.
+
+```md
+## Backend
+
+- [x] VM interpreter
+- [x] C codegen
+- [ ] LLVM codegen
+
+### Subsections group under the parent
+
+- [x] Register allocation
+- [ ] Instruction selection
+```
+
+- `## Heading` starts a new section row in the table
+- `### Subheading` groups items under the current section
+- `- [x]` counts as done, `- [ ]` counts as remaining
+
+## Install
+
+### Homebrew (macOS / Linux)
+
+```sh
+brew install nickglenn/tap/proggy
+```
+
+### Scoop (Windows)
+
+```powershell
+scoop bucket add nickglenn https://github.com/nickglenn/scoop-bucket
+scoop install proggy
+```
+
+### Go
+
+```sh
+go install github.com/nickglenn/proggy@latest
+```
+
+### From source
+
+```sh
+git clone https://github.com/nickglenn/proggy.git
+cd proggy
+go build -o proggy .
+```
+
+### Debian / Ubuntu
+
+Download the `.deb` from the [latest release](https://github.com/nickglenn/proggy/releases) and install:
+
+```sh
+sudo dpkg -i proggy_*.deb
+```

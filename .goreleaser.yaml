@@ -1,0 +1,68 @@
+version: 2
+
+project_name: proggy
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - binary: proggy
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    format_overrides:
+      - goos: windows
+        format: zip
+
+nfpms:
+  - id: proggy
+    package_name: proggy
+    homepage: https://github.com/nickglenn/proggy
+    maintainer: Nick Glenn <nickglenn@users.noreply.github.com>
+    description: Markdown checklist progress reports in your terminal.
+    license: MIT
+    formats:
+      - deb
+      - rpm
+
+brews:
+  - repository:
+      owner: nickglenn
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: https://github.com/nickglenn/proggy
+    description: Markdown checklist progress reports in your terminal.
+    license: MIT
+    install: |
+      bin.install "proggy"
+
+scoops:
+  - repository:
+      owner: nickglenn
+      name: scoop-bucket
+      token: "{{ .Env.SCOOP_BUCKET_TOKEN }}"
+    homepage: https://github.com/nickglenn/proggy
+    description: Markdown checklist progress reports in your terminal.
+    license: MIT
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^ci:"
+      - "^chore:"
