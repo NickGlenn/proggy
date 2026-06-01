@@ -26,9 +26,10 @@ var version = "dev"
 
 // ANSI escape sequences.
 const (
-	ansiDim   = "\x1b[2m"
-	ansiReset = "\x1b[0m"
-	ansiClear = "\x1b[2J\x1b[H"
+	ansiDim    = "\x1b[2m"
+	ansiReset  = "\x1b[0m"
+	ansiClear  = "\x1b[2J\x1b[H"
+	ansiYellow = "\x1b[33m"
 )
 
 // useColor returns true when stdout looks like a color-capable TTY.
@@ -51,6 +52,7 @@ func useColor() bool {
 type section struct {
 	name    string
 	checked int
+	partial int
 	total   int
 }
 
@@ -126,12 +128,18 @@ func render(path string) error {
 		if strings.HasPrefix(trimmed, "- [x]") {
 			current.checked++
 			current.total++
+		} else if strings.HasPrefix(trimmed, "- [/]") ||
+			strings.HasPrefix(trimmed, "- [~]") ||
+			strings.HasPrefix(trimmed, "- [-]") {
+			current.partial++
+			current.total++
 		} else if strings.HasPrefix(trimmed, "- [ ]") {
 			current.total++
 		}
 	}
 
 	totalChecked := 0
+	totalPartial := 0
 	totalAll := 0
 	color := useColor()
 
@@ -151,13 +159,14 @@ func render(path string) error {
 		if s.total > 0 {
 			pct = s.checked * 100 / s.total
 		}
-		bar := progressBar(pct, 20)
+		bar := progressBar(s.checked, s.partial, s.total, 20, color)
 		prefix, suffix := "", ""
 		if color && pct == 100 {
 			prefix, suffix = ansiDim, ansiReset
 		}
 		fmt.Printf("  %s%-40s %4d %6d %5d%%  %s%s\n", prefix, s.name, s.checked, s.total, pct, bar, suffix)
 		totalChecked += s.checked
+		totalPartial += s.partial
 		totalAll += s.total
 	}
 
@@ -171,7 +180,7 @@ func render(path string) error {
 	if totalAll > 0 {
 		totalPct = totalChecked * 100 / totalAll
 	}
-	bar := progressBar(totalPct, 20)
+	bar := progressBar(totalChecked, totalPartial, totalAll, 20, color)
 	fmt.Printf("  %-40s %4d %6d %5d%%  %s\n", "TOTAL", totalChecked, totalAll, totalPct, bar)
 	fmt.Println()
 
@@ -205,10 +214,22 @@ func runWatch(path string) {
 	}
 }
 
-func progressBar(pct, width int) string {
-	filled := pct * width / 100
-	if filled > width {
-		filled = width
+func progressBar(checked, partial, total, width int, color bool) string {
+	if total == 0 {
+		return "[" + strings.Repeat("░", width) + "]"
 	}
-	return "[" + strings.Repeat("█", filled) + strings.Repeat("░", width-filled) + "]"
+	filled := checked * width / total
+	yellow := partial * width / total
+	if filled+yellow > width {
+		yellow = width - filled
+	}
+	empty := width - filled - yellow
+	bar := strings.Repeat("█", filled)
+	if yellow > 0 && color {
+		bar += ansiYellow + strings.Repeat("█", yellow) + ansiReset
+	} else {
+		bar += strings.Repeat("█", yellow)
+	}
+	bar += strings.Repeat("░", empty)
+	return "[" + bar + "]"
 }
