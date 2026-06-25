@@ -12,7 +12,7 @@ $ proggy PROGRESS.md
   TOTAL                                      51     59    86%  [█████████████████░░░]
 ```
 
-**proggy** reads any markdown file with `## Heading` sections and `- [x]` / `- [ ]` checkboxes, then prints a clean completion table with progress bars. Fully-complete sections are dimmed so you can focus on what's left.
+**proggy** reads any markdown file with `## Heading` sections and `- [x]` / `- [ ]` checkboxes, then prints a clean completion table with progress bars. Sub-headings (`###`–`######`) render as an indented tree, parent rows roll up all descendant tasks, and fully-complete sections are dimmed so you can focus on what's left.
 
 ## Install
 
@@ -55,9 +55,20 @@ proggy path/to/TODO.md
 # Live-watch mode: re-renders on file changes
 proggy --watch
 
+# Control how deep sub-sections render (0–4, default 1)
+proggy --depth=2 path/to/TODO.md
+
+# Remove completed tasks and fully-complete sections in place
+proggy --prune path/to/TODO.md
+
+# Move the removed tasks/sections into another file instead of discarding
+proggy --prune --prune-to=DONE.md path/to/TODO.md
+
 # Print version
 proggy --version
 ```
+
+> Flags must precede the path, e.g. `proggy --depth=2 TODO.md`.
 
 ## Markdown format
 
@@ -75,15 +86,30 @@ proggy expects this structure:
 - [ ] Still working on this
 ```
 
-- `## Heading` starts a new section row in the table
-- `### Subheading` groups items under the current section
-- `- [x]` counts as done, `- [ ]` counts as remaining
+- `## Heading` starts a new top-level section row in the table
+- `### Subheading` (through `######`) nest as indented child rows, drawn with a box-drawing tree (`├─`, `└─`, `│`)
+- Parent rows roll up the counts of all their descendants
+- `--depth=N` (0–4, default 1) sets how deep sub-sections render; deeper levels stay hidden but still count toward their parents
+- `- [x]` counts as done, `- [ ]` as remaining, and `- [/]` / `- [~]` / `- [-]` as in-progress (shown as a yellow bar segment)
+
+## Pruning
+
+`--prune` rewrites the file in place, removing every completed task and any
+(sub)section whose tasks — and all of its descendants' tasks — are complete.
+Sections with open or in-progress work keep those items (and surrounding prose)
+but shed their completed tasks. **This is destructive and makes no backup.**
+
+`--prune-to=<path>` moves the removed tasks and sections into another markdown
+file instead of discarding them, merging into matching headings (by title at
+each level) so completed work accumulates without duplicating heading lines.
 
 ## Features
 
+- Hierarchical section tree with rolled-up parent counts and `--depth` control
 - Progress bars with filled/empty blocks
 - Dimmed rows for 100% sections (respects `NO_COLOR` and `TERM=dumb`)
 - `--watch` mode polls for file changes and live-updates
+- `--prune` / `--prune-to` to clear or archive completed work
 - Zero dependencies, single binary
 
 ## License
